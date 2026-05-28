@@ -26,9 +26,20 @@ else:
     time.sleep(1)
     
     print("Starting Global Cloudflare Tunnel on Port 8000 in a detached session...")
+    # Dynamically locate the cloudflared binary to handle duplicate clone folder nesting robustly
+    cf_path = "./cloudflared"
+    if not os.path.exists(cf_path):
+        if os.path.exists("../cloudflared"):
+            cf_path = "../cloudflared"
+        else:
+            import shutil
+            system_cf = shutil.which("cloudflared")
+            if system_cf:
+                cf_path = system_cf
+                
     # Use os.setsid to completely detach the process group so stopping other cells won't kill the tunnel!
     cf_proc = subprocess.Popen(
-        ["./cloudflared", "tunnel", "--url", "http://127.0.0.1:8000"],
+        [cf_path, "tunnel", "--url", "http://127.0.0.1:8000"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
