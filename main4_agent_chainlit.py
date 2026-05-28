@@ -52,17 +52,13 @@ async def on_chat_start():
     Called when the chat session starts. 
     Connects to the running MCP server, extracts available tools, and binds them to the LLM.
     """
-    # 1. Show a loading screen while connecting to the MCP Server
-    loading_msg = cl.Message(content="Connecting to MyAssistantTools MCP Server...")
-    await loading_msg.send()
-    
     try:
-        # 2. Connect to MCP server and fetch tool schemas
+        # 1. Connect to MCP server and fetch tool schemas
         mcp_client = MultiServerMCPClient(MCP_SERVER_CONFIG)
         tools = await mcp_client.get_tools()
         tool_map = {t.name: t for t in tools}
         
-        # 3. Bind the tools to our standard LangChain model
+        # 2. Bind the tools to our standard LangChain model
         bound_model = aimodel.bind_tools(tools)
         
         # Save model and tool reference in the session cache
@@ -78,30 +74,18 @@ async def on_chat_start():
             
         cl.user_session.set("messages", [SystemMessage(content=system_prompt)])
         
-        # Update loading message with a beautiful welcome page and quick suggestion prompts
-        await loading_msg.update()
-        loading_msg.content = (
-            "**Travel Buddy AI Agent Online!**\n\n"
-            "I am connected to your `MyAssistantTools` MCP server and equipped with coordinates, weather forecast, and travel journal tools.\n\n"
-            "**Try asking me these multi-step questions to see my agentic tool-use in action:**\n"
-            "*   *\"What is the current weather like in Tokyo?\"* (The agent will automatically first find Tokyo's coordinates, then fetch the weather!)\n"
-            "*   *\"Save in my travel journal that I would love to visit Kyoto next spring.\"*\n"
-            "*   *\"Read my travel journal to see my notes.\"*\n"
-            "*   *\"What is the current local time?\"*"
-        )
-        await loading_msg.update()
-        
     except Exception as e:
-        await loading_msg.update()
-        loading_msg.content = (
-            "**Failed to connect to the MCP Server!**\n\n"
-            "Please make sure the simple MCP server is running first:\n"
-            "```bash\n"
-            "python mcpserver.py\n"
-            "```\n"
-            f"Error details: `{str(e)}`"
-        )
-        await loading_msg.update()
+        # Send error notification only if connection fails so the user knows they need to check port 8001
+        await cl.Message(
+            content=(
+                "**Failed to connect to the MCP Server!**\n\n"
+                "Please make sure the simple MCP server is running first:\n"
+                "```bash\n"
+                "python mcpserver.py\n"
+                "```\n"
+                f"Error details: `{str(e)}`"
+            )
+        ).send()
 
 
 async def run_single_tool(tool_call, tool_map) -> ToolMessage:

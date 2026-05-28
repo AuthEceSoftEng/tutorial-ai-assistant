@@ -35,11 +35,6 @@ async def on_chat_start():
     
     # Store message history inside Chainlit's session storage
     cl.user_session.set("messages", [SystemMessage(content=system_prompt_text)])
-    
-    # Send a friendly greeting card
-    await cl.Message(
-        content="**Welcome to your Chainlit AI Assistant!**\nAsk me anything. I will stream responses in real-time."
-    ).send()
 
 @cl.on_message
 async def on_message(message: cl.Message):
