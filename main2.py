@@ -1,9 +1,15 @@
+print("Initializing streaming AI Assistant... (Loading generator configurations)", flush=True)
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from model import get_model
 
 aimodel = get_model()
-with open("system_prompt.txt", "r") as infile:
-    system_prompt_text = infile.read().strip()
+
+import os
+if os.path.exists("system_prompt.txt"):
+    with open("system_prompt.txt", "r") as infile:
+        system_prompt_text = infile.read().strip()
+else:
+    system_prompt_text = "You are a helpful AI assistant. Your tone is professional yet friendly."
 system_prompt = SystemMessage(content=system_prompt_text)
 
 print("AI Assistant is ready! (Type 'exit' to stop)")

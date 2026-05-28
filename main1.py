@@ -1,3 +1,4 @@
+print("Initializing stateless AI Assistant... (Loading LangChain and Gemini configurations)", flush=True)
 from langchain_core.messages import SystemMessage, HumanMessage
 from model import get_model
 

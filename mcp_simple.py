@@ -3,7 +3,7 @@ from fastmcp import FastMCP
 from datetime import datetime
 
 # Initialize the server
-mcp = FastMCP("MyAssistantTools")
+mcp = FastMCP("SimpleServer")
 
 @mcp.tool()
 def add_numbers(a: int, b: int) -> int:
